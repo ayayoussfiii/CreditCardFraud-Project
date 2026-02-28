@@ -14,3 +14,20 @@ Features: Credit limit, payment history (6 months), bill amounts, payment amount
 
 <img width="491" height="207" alt="image" src="https://github.com/user-attachments/assets/8c864a0a-7c39-4658-a770-4c1f31a3e1f6" />
 
+<img width="659" height="290" alt="image" src="https://github.com/user-attachments/assets/167a9698-9083-4266-a880-8f7bcfdb0cd4" />
+
+<img width="922" height="411" alt="image" src="https://github.com/user-attachments/assets/296e5880-fd83-4e9b-ab83-0220cddbde6d" />
+
+<img width="900" height="491" alt="image" src="https://github.com/user-attachments/assets/a46ee536-9422-48b9-a135-b5e007f7eb15" />
+
+<img width="877" height="311" alt="image" src="https://github.com/user-attachments/assets/0f546c78-591b-4d02-a77d-6a5568c0a300" />
+
+<img width="877" height="464" alt="image" src="https://github.com/user-attachments/assets/50c83b47-6639-426a-bf2f-7ed930466eef" />
+
+<img width="875" height="422" alt="image" src="https://github.com/user-attachments/assets/5aaeed07-8370-4358-85ac-9b0d6fe81f88" />
+
+
+
+
+
+
