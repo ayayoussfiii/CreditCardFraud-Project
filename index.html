@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditRisk AI — Aya Youssfi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #080a0f;
+    --surface: #0e1117;
+    --surface2: #141820;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4fffb0;
+    --accent2: #00d4ff;
+    --danger: #ff4f6d;
+    --gold: #f5c842;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'Outfit', system-ui, sans-serif;
+    --mono: 'DM Mono', 'Courier New', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 0.45rem 1.2rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .nav-cta:hover { background: var(--accent); color: var(--black); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 8rem 4rem 6rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* Grid lines background */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,255,176,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,255,176,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
+  }
+
+  /* Radial glow */
+  .hero-glow {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(79,255,176,0.07) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 820px;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(79,255,176,0.3);
+    padding: 0.35rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 1.4s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: var(--black);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 0.9rem 2rem;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    padding: 0.9rem 2rem;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat-item {
+    padding: 2.5rem 2rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-num span { color: var(--accent); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 4rem;
+  }
+
+  .section-pad { padding: 7rem 0; }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 540px;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* ─── PIPELINE ─── */
+  .pipeline {
+    background: var(--surface);
+  }
+
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    border: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+
+  .pipeline-step {
+    padding: 2.5rem 2rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.25s;
+  }
+
+  .pipeline-step:last-child { border-right: none; }
+  .pipeline-step:hover { background: var(--surface2); }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+
+  .step-icon {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .step-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .step-tech {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.55rem;
+    background: rgba(79,255,176,0.08);
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── MODELS ─── */
+  .models-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+
+  .model-card {
+    background: var(--surface);
+    padding: 2.5rem 2rem;
+    transition: background 0.25s;
+  }
+
+  .model-card:hover { background: var(--surface2); }
+
+  .model-card.featured {
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .model-card.featured::before {
+    content: 'Meilleur modèle';
+    position: absolute;
+    top: 1.2rem; right: 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(79,255,176,0.4);
+    padding: 0.25rem 0.6rem;
+  }
+
+  .model-name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .model-type {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+  }
+
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric-row:last-child { border-bottom: none; }
+
+  .metric-name {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .metric-val {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .metric-val.good { color: var(--accent); }
+  .metric-val.warn { color: var(--gold); }
+  .metric-val.danger { color: var(--danger); }
+
+  /* ─── CLUSTERS ─── */
+  .clusters-section { background: var(--surface); }
+
+  .clusters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+
+  .cluster-card {
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    position: relative;
+    transition: border-color 0.25s;
+  }
+
+  .cluster-card:hover { border-color: var(--border2); }
+
+  .cluster-num {
+    font-family: var(--serif);
+    font-size: 4rem;
+    color: rgba(255,255,255,0.05);
+    position: absolute;
+    top: 1rem; right: 1.5rem;
+    line-height: 1;
+  }
+
+  .cluster-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .badge-0 { background: rgba(0,212,255,0.1); color: var(--accent2); }
+  .badge-1 { background: rgba(79,255,176,0.1); color: var(--accent); }
+  .badge-2 { background: rgba(245,200,66,0.1); color: var(--gold); }
+
+  .cluster-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 0.8rem;
+  }
+
+  .cluster-desc {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+
+  .cluster-risk {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .risk-bar-wrap {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+  }
+
+  .risk-bar {
+    height: 100%;
+    transition: width 1s ease;
+  }
+
+  .risk-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ─── SHAP ─── */
+  .shap-section { background: var(--black); }
+
+  .shap-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+    margin-top: 4rem;
+  }
+
+  .shap-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .feature-name {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .feature-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 0;
+  }
+
+  .feature-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .feature-score {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    width: 40px;
+    text-align: right;
+  }
+
+  .shap-info h3 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  .shap-info p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  .shap-insight {
+    border-left: 2px solid var(--accent);
+    padding: 1rem 1.5rem;
+    background: rgba(79,255,176,0.04);
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  /* ─── TECH STACK ─── */
+  .tech-section { background: var(--surface); }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 4rem;
+  }
+
+  .tech-item {
+    background: var(--surface);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: background 0.2s;
+  }
+
+  .tech-item:hover { background: var(--surface2); }
+
+  .tech-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.8rem; }
+
+  .tech-name {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .tech-role {
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: block;
+  }
+
+  /* ─── ABOUT / AUTHOR ─── */
+  .author-section { background: var(--black); }
+
+  .author-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: 5rem;
+    align-items: center;
+    margin-top: 4rem;
+  }
+
+  .author-card {
+    border: 1px solid var(--border);
+    padding: 3rem 2.5rem;
+    text-align: center;
+  }
+
+  .author-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--black);
+    margin: 0 auto 1.5rem;
+  }
+
+  .author-name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 0.3rem;
+  }
+
+  .author-role {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .author-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .author-link {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .author-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  .author-bio h3 {
+    font-family: var(--serif);
+    font-size: 1.7rem;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+
+  .author-bio p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.85;
+    margin-bottom: 1.2rem;
+  }
+
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .skill-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .footer-left span { color: var(--accent); }
+
+  .footer-right {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .footer-right a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .footer-right a:hover { color: var(--text); }
+
+  /* ─── ANIMATIONS ─── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { padding: 7rem 1.5rem 4rem; }
+    .container { padding: 0 1.5rem; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .stat-item:nth-child(2) { border-right: none; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .pipeline-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .models-grid { grid-template-columns: 1fr; }
+    .clusters-grid { grid-template-columns: 1fr; }
+    .shap-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .author-layout { grid-template-columns: 1fr; gap: 3rem; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">// creditrisk.ai</a>
+  <ul class="nav-links">
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#models">Modèles</a></li>
+    <li><a href="#clusters">Clusters</a></li>
+    <li><a href="#shap">Explainabilité</a></li>
+    <li><a href="#about">Auteure</a></li>
+  </ul>
+  <a href="https://github.com/ayayoussfiii/CreditCardFraud-Project" target="_blank" class="nav-cta">GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">Projet Machine Learning · ENSA Fès · 2025</div>
+    <h1>Prédire le défaut<br>de paiement par<br><em>segmentation comportementale</em></h1>
+    <p class="hero-sub">
+      Un système end-to-end de credit scoring sur 30 000 clients —
+      clustering HDBSCAN, Gradient Boosting par cluster, SMOTE,
+      et explicabilité SHAP. Déployé via Flask.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/ayayoussfiii/CreditCardFraud-Project" target="_blank" class="btn-primary">
+        ↗ Voir le code
+      </a>
+      <a href="#pipeline" class="btn-ghost">Explorer le projet ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item fade-up">
+    <div class="stat-num">30<span>k</span></div>
+    <div class="stat-label">Clients analysés</div>
+  </div>
+  <div class="stat-item fade-up" style="transition-delay:0.1s">
+    <div class="stat-num">23</div>
+    <div class="stat-label">Features · UCI dataset</div>
+  </div>
+  <div class="stat-item fade-up" style="transition-delay:0.2s">
+    <div class="stat-num">3</div>
+    <div class="stat-label">Clusters comportementaux</div>
+  </div>
+  <div class="stat-item fade-up" style="transition-delay:0.3s">
+    <div class="stat-num">82<span>%</span></div>
+    <div class="stat-label">Accuracy · GB par cluster</div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<section id="pipeline" class="pipeline section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 01 — pipeline</p>
+      <h2 class="section-title">Architecture du système</h2>
+      <p class="section-sub">Une approche cluster-based : segmenter d'abord, prédire ensuite. Chaque groupe comportemental reçoit son propre modèle calibré.</p>
+    </div>
+    <div class="pipeline-grid fade-up" style="transition-delay:0.15s">
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 01</span>
+        <span class="step-icon">🗃</span>
+        <div class="step-title">Données UCI</div>
+        <p class="step-desc">30 000 clients, 6 mois d'historique de paiement, montants de factures et démographie.</p>
+        <div class="step-tech"><span class="tag">pandas</span><span class="tag">numpy</span></div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 02</span>
+        <span class="step-icon">🧹</span>
+        <div class="step-title">Nettoyage & Feature Engineering</div>
+        <p class="step-desc">Gestion des valeurs aberrantes, encodage des variables catégorielles, normalisation.</p>
+        <div class="step-tech"><span class="tag">sklearn</span><span class="tag">clean_data.py</span></div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 03</span>
+        <span class="step-icon">🔵</span>
+        <div class="step-title">Clustering HDBSCAN</div>
+        <p class="step-desc">Segmentation non supervisée en 3 groupes comportementaux. Gestion des outliers (-1).</p>
+        <div class="step-tech"><span class="tag">hdbscan</span><span class="tag">umap</span></div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 04</span>
+        <span class="step-icon">⚖️</span>
+        <div class="step-title">SMOTE · Équilibrage</div>
+        <p class="step-desc">Sursampling synthétique de la classe minoritaire (défaut) par cluster pour éviter le biais.</p>
+        <div class="step-tech"><span class="tag">imbalanced-learn</span></div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 05</span>
+        <span class="step-icon">🌲</span>
+        <div class="step-title">Modèles par cluster</div>
+        <p class="step-desc">Un Gradient Boosting entraîné par cluster + Naive Bayes comme baseline comparatif.</p>
+        <div class="step-tech"><span class="tag">xgboost</span><span class="tag">sklearn</span></div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">ÉTAPE 06</span>
+        <span class="step-icon">💡</span>
+        <div class="step-title">SHAP · Explicabilité</div>
+        <p class="step-desc">Valeurs SHAP pour expliquer chaque prédiction — quels facteurs ont le plus pesé.</p>
+        <div class="step-tech"><span class="tag">shap</span><span class="tag">flask</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELS -->
+<section id="models" class="section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 02 — modèles</p>
+      <h2 class="section-title">Performance des modèles</h2>
+      <p class="section-sub">Comparaison entre la baseline Naive Bayes et le Gradient Boosting spécialisé par cluster comportemental.</p>
+    </div>
+    <div class="models-grid fade-up" style="transition-delay:0.15s">
+      <div class="model-card">
+        <div class="model-name">Naive Bayes</div>
+        <div class="model-type">Baseline · Global</div>
+        <div class="metric-row">
+          <span class="metric-name">accuracy</span>
+          <span class="metric-val warn">0.74</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">precision</span>
+          <span class="metric-val">0.52</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">recall</span>
+          <span class="metric-val">0.49</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">f1-score</span>
+          <span class="metric-val">0.50</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">roc-auc</span>
+          <span class="metric-val">0.68</span>
+        </div>
+      </div>
+      <div class="model-card featured">
+        <div class="model-name">Gradient Boosting</div>
+        <div class="model-type">Par cluster · Avec SMOTE</div>
+        <div class="metric-row">
+          <span class="metric-name">accuracy</span>
+          <span class="metric-val good">0.82</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">precision</span>
+          <span class="metric-val good">0.71</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">recall</span>
+          <span class="metric-val good">0.68</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">f1-score</span>
+          <span class="metric-val good">0.69</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">roc-auc</span>
+          <span class="metric-val good">0.86</span>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-name">Approche globale</div>
+        <div class="model-type">GB · Sans clustering</div>
+        <div class="metric-row">
+          <span class="metric-name">accuracy</span>
+          <span class="metric-val">0.79</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">precision</span>
+          <span class="metric-val">0.63</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">recall</span>
+          <span class="metric-val">0.58</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">f1-score</span>
+          <span class="metric-val">0.60</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">roc-auc</span>
+          <span class="metric-val">0.80</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLUSTERS -->
+<section id="clusters" class="clusters-section section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 03 — segmentation</p>
+      <h2 class="section-title">Profils comportementaux</h2>
+      <p class="section-sub">HDBSCAN identifie 3 groupes distincts de clients selon leurs habitudes de paiement sur 6 mois.</p>
+    </div>
+    <div class="clusters-grid fade-up" style="transition-delay:0.15s">
+      <div class="cluster-card">
+        <div class="cluster-num">0</div>
+        <span class="cluster-badge badge-0">Cluster 0</span>
+        <div class="cluster-title">Clients disciplinés</div>
+        <p class="cluster-desc">Paiements réguliers, faibles soldes reportés. Historique de crédit stable sur 6 mois. Profil low-risk dominant dans le dataset.</p>
+        <div class="cluster-risk">
+          <span class="risk-label">Risque défaut</span>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar" style="width:18%; background: var(--accent2);"></div>
+          </div>
+          <span class="risk-label">18%</span>
+        </div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-num">1</div>
+        <span class="cluster-badge badge-1">Cluster 1</span>
+        <div class="cluster-title">Clients irréguliers</div>
+        <p class="cluster-desc">Paiements erratiques, utilisation élevée du crédit mais généralement couverts. Profil intermédiaire, sensible aux chocs.</p>
+        <div class="cluster-risk">
+          <span class="risk-label">Risque défaut</span>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar" style="width:41%; background: var(--gold);"></div>
+          </div>
+          <span class="risk-label">41%</span>
+        </div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-num">2</div>
+        <span class="cluster-badge badge-2">Cluster 2</span>
+        <div class="cluster-title">Clients à risque élevé</div>
+        <p class="cluster-desc">Retards répétés, montants de factures élevés par rapport aux paiements. Signaux précoces de détresse financière.</p>
+        <div class="cluster-risk">
+          <span class="risk-label">Risque défaut</span>
+          <div class="risk-bar-wrap">
+            <div class="risk-bar" style="width:67%; background: var(--danger);"></div>
+          </div>
+          <span class="risk-label">67%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHAP -->
+<section id="shap" class="shap-section section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 04 — explicabilité</p>
+      <h2 class="section-title">Comprendre chaque prédiction</h2>
+    </div>
+    <div class="shap-layout fade-up" style="transition-delay:0.15s">
+      <div class="shap-features">
+        <p style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.5rem;">Importance des features · SHAP mean |φ|</p>
+        <div class="feature-row">
+          <span class="feature-name">PAY_0 (retard mois 1)</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:92%"></div></div>
+          <span class="feature-score">0.31</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">PAY_2 (retard mois 2)</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:74%"></div></div>
+          <span class="feature-score">0.25</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">LIMIT_BAL</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:60%"></div></div>
+          <span class="feature-score">0.20</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">BILL_AMT1</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:48%"></div></div>
+          <span class="feature-score">0.16</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">PAY_AMT1</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:40%"></div></div>
+          <span class="feature-score">0.13</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">PAY_3 (retard mois 3)</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:34%"></div></div>
+          <span class="feature-score">0.11</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">AGE</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:22%"></div></div>
+          <span class="feature-score">0.07</span>
+        </div>
+        <div class="feature-row">
+          <span class="feature-name">EDUCATION</span>
+          <div class="feature-bar-wrap"><div class="feature-bar" style="width:15%"></div></div>
+          <span class="feature-score">0.05</span>
+        </div>
+      </div>
+      <div class="shap-info">
+        <h3>L'historique de retard domine toutes les autres features.</h3>
+        <p>L'analyse SHAP révèle que les variables PAY_0 à PAY_6 (statut de paiement des 6 derniers mois) expliquent à elles seules plus de 60% de la variance de prédiction. Un seul mois de retard crédible est un signal fort.</p>
+        <div class="shap-insight">
+          <strong style="color:var(--accent)">↑ Cluster 2 :</strong> PAY_0 ≥ 2 (retard ≥ 2 mois) pousse la probabilité de défaut de +0.38 en moyenne — c'est le marqueur le plus discriminant.
+        </div>
+        <div class="shap-insight">
+          <strong style="color:var(--accent2)">↑ Cluster 0 :</strong> LIMIT_BAL élevé combiné à PAY_0 = -1 (paiement en avance) réduit le risque de -0.22 en moyenne.
+        </div>
+        <p style="font-size:0.82rem">L'explicabilité SHAP permet de justifier chaque refus de crédit — une exigence réglementaire croissante dans le secteur financier.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="tech-section section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 05 — stack technique</p>
+      <h2 class="section-title">Technologies utilisées</h2>
+    </div>
+    <div class="tech-grid fade-up" style="transition-delay:0.15s">
+      <div class="tech-item">
+        <span class="tech-emoji">🐍</span>
+        <span class="tech-name">Python 3.10</span>
+        <span class="tech-role">Langage principal</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">🔵</span>
+        <span class="tech-name">HDBSCAN</span>
+        <span class="tech-role">Clustering</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">🌲</span>
+        <span class="tech-name">Gradient Boosting</span>
+        <span class="tech-role">Prédiction</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">⚖️</span>
+        <span class="tech-name">SMOTE</span>
+        <span class="tech-role">Équilibrage</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">💡</span>
+        <span class="tech-name">SHAP</span>
+        <span class="tech-role">Explicabilité</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">🌐</span>
+        <span class="tech-name">Flask</span>
+        <span class="tech-role">API · Déploiement</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">🐼</span>
+        <span class="tech-name">Pandas · NumPy</span>
+        <span class="tech-role">Data wrangling</span>
+      </div>
+      <div class="tech-item">
+        <span class="tech-emoji">📊</span>
+        <span class="tech-name">Matplotlib · Seaborn</span>
+        <span class="tech-role">Visualisation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section id="about" class="author-section section-pad">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-tag">// 06 — auteure</p>
+      <h2 class="section-title">À propos du projet</h2>
+    </div>
+    <div class="author-layout fade-up" style="transition-delay:0.15s">
+      <div class="author-card">
+        <div class="author-avatar">AY</div>
+        <div class="author-name">Aya Youssfi</div>
+        <div class="author-role">Ingénieure IA & Confiance Numérique<br>ENSA Fès · 2024–2026</div>
+        <div class="author-links">
+          <a href="https://github.com/ayayoussfiii" target="_blank" class="author-link">GitHub</a>
+          <a href="https://linkedin.com/in/aya-youssfi" target="_blank" class="author-link">LinkedIn</a>
+        </div>
+      </div>
+      <div class="author-bio">
+        <h3>Un projet à la frontière du ML et de la finance.</h3>
+        <p>Ce système a été conçu pour dépasser les approches globales traditionnelles du credit scoring. L'intuition centrale : les clients ne forment pas un groupe homogène — leur comportement de paiement révèle des patterns distincts qui méritent des modèles distincts.</p>
+        <p>L'intégration de SHAP n'est pas anecdotique : dans un contexte réglementaire où les décisions de crédit doivent être explicables (RGPD, directives EBA), la boîte noire n'est plus acceptable. Chaque prédiction est justifiable.</p>
+        <div class="skills-list">
+          <span class="skill-tag">Machine Learning</span>
+          <span class="skill-tag">Clustering non supervisé</span>
+          <span class="skill-tag">Credit Risk Modeling</span>
+          <span class="skill-tag">SHAP · XAI</span>
+          <span class="skill-tag">Flask · API REST</span>
+          <span class="skill-tag">Imbalanced Learning</span>
+          <span class="skill-tag">Feature Engineering</span>
+          <span class="skill-tag">Data Ethics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <span>// creditrisk.ai</span> · Aya Youssfi · ENSA Fès 2025
+  </div>
+  <div class="footer-right">
+    <a href="https://github.com/ayayoussfiii/CreditCardFraud-Project" target="_blank">GitHub</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#models">Modèles</a>
+    <a href="#shap">SHAP</a>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
